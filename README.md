@@ -1,2 +1,127 @@
-# CryptoInvestment
-Crypto dahsboard for CoinMarketCap API testing
+# 📊 CryptoInvestment
+
+CryptoInvestment es una aplicación web **fullstack** que permite a un grupo de inversores en criptomonedas visualizar el rendimiento de un conjunto personalizado de criptos, con precios actualizados, cambios porcentuales y volumen de mercado en tiempo real, además de un historial consultable por rango de fechas.  
+
+## 🚀 Tecnologías
+
+- **Frontend:** React.js (SPA, Single Page Application)
+- **Backend:** Node.js + Express
+- **Base de datos:** MySQL
+- **API de datos:** [CoinMarketCap API](https://coinmarketcap.com/api/) (clave API gratuita)
+- **Gráficos:** Chart.js o Recharts
+- **Control de versiones:** Git + GitHub
+
+---
+
+## 📌 Características principales
+
+- Selección de criptomonedas personalizadas.
+- Visualización de precio, cambio porcentual y volumen en tiempo real.
+- Actualización automática sin recargar la página.
+- Historial de precios con consultas por rango de fechas.
+- Interfaz responsiva para múltiples dispositivos.
+- Persistencia de datos en MySQL.
+
+---
+
+## 📂 Estructura del proyecto
+
+```
+
+/frontend
+/src
+/components
+/pages
+/services
+App.js
+index.js
+/backend
+/src
+/routes
+/controllers
+/services
+/models
+server.js
+config.js
+
+````
+
+---
+
+## ⚙️ Instalación y configuración
+
+### 1. Clonar repositorios
+```bash
+git clone https://github.com/usuario/cryptoinvestment-frontend.git
+git clone https://github.com/usuario/cryptoinvestment-backend.git
+````
+
+### 2. Configurar el backend
+
+```bash
+cd cryptoinvestment-backend
+yarn install
+cp .env.example .env
+# Editar el archivo .env con las credenciales de MySQL y API Key de CoinMarketCap
+yarn start
+```
+
+### 3. Configurar el frontend
+
+```bash
+cd cryptoinvestment-frontend
+yarn install
+yarn start
+```
+
+---
+
+## 🗄 Modelo de base de datos (MySQL)
+
+Tablas principales:
+
+* **cryptocurrencies**: Información básica de cada criptomoneda.
+* **prices**: Historial de precios y métricas.
+* **users** *(opcional)*: Para autenticación y preferencias de usuario.
+
+Modelo ER:
+*(Incluir aquí el diagrama generado en formato PNG o enlace a la herramienta usada)*
+
+---
+
+## 🔌 Integración con CoinMarketCap API
+
+* Endpoint listado de criptos: `/v1/cryptocurrency/listings/latest`
+* Endpoint datos actuales: `/v1/cryptocurrency/quotes/latest`
+* Endpoint histórico: `/v1/cryptocurrency/ohlcv/historical`
+
+Las pruebas de endpoints se realizaron con **Postman** antes de la implementación.
+
+---
+
+## 🧪 Pruebas
+
+* **Pruebas funcionales**:
+
+  * Selección y visualización de criptos.
+  * Consulta histórica por rango de fechas.
+* **Pruebas no funcionales**:
+
+  * Responsividad en móviles, tablets y desktop.
+  * Velocidad de actualización.
+  * Uso eficiente de recursos.
+
+---
+
+## 📦 Entregables
+
+* Repositorios GitHub de frontend y backend.
+* Script SQL de la base de datos.
+* Modelo ER.
+* Vídeo explicativo de la arquitectura, componentes y flujo de datos.
+
+---
+
+## 👨‍💻 Autor
+
+Proyecto desarrollado por @pedrozopayares [Javier Pedrozo] como parte del reto **CryptoInvestment**.
