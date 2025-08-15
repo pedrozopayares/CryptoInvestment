@@ -4,11 +4,11 @@ CryptoInvestment es una aplicación web **fullstack** que permite a un grupo de 
 
 ## 🚀 Tecnologías
 
-- **Frontend:** React.js (SPA, Single Page Application)
+- **Frontend:** React.js + Vite (SPA, Single Page Application)
 - **Backend:** Node.js + Express
 - **Base de datos:** MySQL
 - **API de datos:** [CoinMarketCap API](https://coinmarketcap.com/api/) (clave API gratuita)
-- **Gráficos:** Chart.js o Recharts
+- **Gráficos:** [Lightweight Charts](https://www.tradingview.com/lightweight-charts/)
 - **Control de versiones:** Git + GitHub
 
 ---
@@ -29,20 +29,7 @@ CryptoInvestment es una aplicación web **fullstack** que permite a un grupo de 
 ```
 
 /frontend
-/src
-/components
-/pages
-/services
-App.js
-index.js
 /backend
-/src
-/routes
-/controllers
-/services
-/models
-server.js
-config.js
 
 ````
 
@@ -52,8 +39,7 @@ config.js
 
 ### 1. Clonar repositorios
 ```bash
-git clone https://github.com/usuario/cryptoinvestment-frontend.git
-git clone https://github.com/usuario/cryptoinvestment-backend.git
+git clone https://github.com/pedrozopayares/cryptoinvestment.git
 ````
 
 ### 2. Configurar el backend
@@ -69,7 +55,7 @@ yarn start
 ### 3. Configurar el frontend
 
 ```bash
-cd cryptoinvestment-frontend
+cd cryptoinvestment
 yarn install
 yarn start
 ```
