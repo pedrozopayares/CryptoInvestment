@@ -1,7 +1,13 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST
+dotenv.config();
+
 import { SERVER } from './config/config';
 import http from 'http';
 import express from 'express';
 import './config/logging';
+import { connectDatabase, closeDatabase } from './db/connection';
 import { loggingHandler } from './middleware/loggingHandler';
 import { corsHandler } from './middleware/corsHandler';
 import { routeNotFound } from './middleware/routeNotFound';
@@ -9,10 +15,15 @@ import { routeNotFound } from './middleware/routeNotFound';
 export const application = express();
 export let httpServer: ReturnType<typeof http.createServer>;
 
-export const Main = () => {
+export const Main = async () => {
     logging.info('--------------------------------');
     logging.info('Starting CryptoInvestment Backend');
     logging.info('--------------------------------');
+    
+    // Database connection
+    await connectDatabase();
+    
+    // Express middleware
     application.use(express.json());
     application.use(express.urlencoded({ extended: true }));
 
@@ -25,12 +36,24 @@ export const Main = () => {
     logging.info('---------------------------------');
     logging.info('Define Controller Routing');
     logging.info('---------------------------------');
+    
+    // Health check endpoint
+    application.get('/health', (req, res) => {
+        res.status(200).json({ 
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV || 'development',
+            database: 'connected' // TODO: add actual db health check
+        });
+    });
+    
     application.get('/main/healthcheck', (req, res, next) => {
         return res.status(200).json({ status: 'ok' });
     });
 
     logging.info('---------------------------------');
-    logging.info('Define Controller Routing');
+    logging.info('Define Routing Error Handler');
     logging.info('---------------------------------');
     application.use(routeNotFound);
 
@@ -39,19 +62,44 @@ export const Main = () => {
     logging.info('---------------------------------');
     httpServer = http.createServer(application);
     httpServer.listen(SERVER.SERVER_PORT, () => {
-        logging.info(`Server is running at http://${SERVER.SERVER_HOSTNAME}:${SERVER.SERVER_PORT}`);
-        logging.info(`Environment: ${process.env.NODE_ENV}`);
+        logging.info(`🚀 Server running at http://${SERVER.SERVER_HOSTNAME}:${SERVER.SERVER_PORT}`);
+        logging.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        logging.info(`🔗 Health check: http://${SERVER.SERVER_HOSTNAME}:${SERVER.SERVER_PORT}/health`);
     });
 }
 
-export const Shutdown = (callback: any) => {
+export const Shutdown = async (callback: any) => {
     logging.info('---------------------------------');
     logging.info('Shutting down server...');
     logging.info('---------------------------------');
-    httpServer && httpServer.close(() => {
-        logging.info('Server shut down successfully.');
+    
+    // Close database connections
+    await closeDatabase();
+    
+    // Close HTTP server
+    if (httpServer) {
+        httpServer.close(() => {
+            logging.info('✅ Server shut down successfully.');
+            callback();
+        });
+    } else {
         callback();
-    });
+    }
 }
 
-Main();
+// Graceful shutdown handlers
+process.on('SIGTERM', () => {
+    logging.info('SIGTERM received, shutting down gracefully');
+    Shutdown(() => process.exit(0));
+});
+
+process.on('SIGINT', () => {
+    logging.info('SIGINT received, shutting down gracefully');
+    Shutdown(() => process.exit(0));
+});
+
+// Start the application
+Main().catch((error) => {
+    logging.error('❌ Failed to start server:', error);
+    process.exit(1);
+});

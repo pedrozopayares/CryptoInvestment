@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.4.6
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cryptoinvestment
+      MYSQL_USER: cryptouser
+      MYSQL_PASSWORD: cryptopass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - crypto-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: cryptouser
+      DB_PASSWORD: cryptopass
+      DB_NAME: cryptoinvestment
+      JWT_SECRET: docker-jwt-secret-key
+      COINMARKETCAP_API_KEY: ${COINMARKETCAP_API_KEY:-}
+      FRONTEND_URL: http://localhost:5173
+    networks:
+      - crypto-network
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: cryptouser
+      PMA_PASSWORD: cryptopass
+    depends_on:
+      - mysql
+    networks:
+      - crypto-network
+
+volumes:
+  mysql_data:
+
+networks:
+  crypto-network:
+    driver: bridge
