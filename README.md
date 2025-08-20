@@ -1,6 +1,36 @@
+
 # 📊 CryptoInvestment
 
 CryptoInvestment es una aplicación web **fullstack** que permite a un grupo de inversores en criptomonedas visualizar el rendimiento de un conjunto personalizado de criptos, con precios actualizados, cambios porcentuales y volumen de mercado en tiempo real, además de un historial consultable por rango de fechas.  
+
+---
+
+## 🔌 WebSocket API (Tiempo real y autenticación JWT)
+
+El backend expone un WebSocket en el **mismo puerto** que la API HTTP, permitiendo comunicación bidireccional en tiempo real (por ejemplo, para actualizaciones de precios, notificaciones, etc.).
+
+- **URL de conexión:**
+  - `ws://localhost:3001/?token=TU_JWT_AQUI`
+  - El token JWT debe ser válido y se envía como query param `token`.
+
+- **Autenticación:**
+  - El servidor valida el JWT al conectar. Si es inválido, la conexión se cierra inmediatamente.
+  - Solo usuarios autenticados pueden mantener la conexión.
+
+- **Ejemplo de conexión desde el frontend:**
+  ```js
+  const ws = new WebSocket('ws://localhost:3001/?token=TU_JWT_AQUI');
+  ws.onopen = () => ws.send('Hola WebSocket');
+  ws.onmessage = (event) => console.log('Mensaje:', event.data);
+  ws.onclose = (event) => console.log('Cerrado:', event.code, event.reason);
+  ```
+
+- **Notas:**
+  - El WebSocket comparte el puerto con la API REST.
+  - Puedes enviar y recibir mensajes en tiempo real.
+  - El backend puede emitir eventos a todos los clientes autenticados.
+
+---
 
 ## 🚀 Tecnologías
 
