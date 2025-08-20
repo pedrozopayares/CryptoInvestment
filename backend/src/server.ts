@@ -14,6 +14,7 @@ import { corsHandler } from './middleware/corsHandler';
 import { routeNotFound } from './middleware/routeNotFound';
 import authRouter from './routes/auth';
 import adminRouter from './routes/admin';
+import { initWebSocketService } from './services/websocketService';
 
 export const application = express();
 export let httpServer: ReturnType<typeof http.createServer>;
@@ -68,6 +69,10 @@ export const Main = async () => {
     logging.info('Start Server');
     logging.info('---------------------------------');
     httpServer = http.createServer(application);
+
+    // Inicializar WebSocketService (autenticado por JWT)
+    initWebSocketService(httpServer);
+
     httpServer.listen(SERVER.SERVER_PORT, () => {
         logging.info(`🚀 Server running at http://${SERVER.SERVER_HOSTNAME}:${SERVER.SERVER_PORT}`);
         logging.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
