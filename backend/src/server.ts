@@ -8,9 +8,12 @@ import http from 'http';
 import express from 'express';
 import './config/logging';
 import { connectDatabase, closeDatabase } from './db/connection';
+
 import { loggingHandler } from './middleware/loggingHandler';
 import { corsHandler } from './middleware/corsHandler';
 import { routeNotFound } from './middleware/routeNotFound';
+import authRouter from './routes/auth';
+import adminRouter from './routes/admin';
 
 export const application = express();
 export let httpServer: ReturnType<typeof http.createServer>;
@@ -33,10 +36,18 @@ export const Main = async () => {
     application.use(loggingHandler);
     application.use(corsHandler);
 
+
     logging.info('---------------------------------');
     logging.info('Define Controller Routing');
     logging.info('---------------------------------');
-    
+
+
+    // Auth routes
+    application.use('/api/v1/auth', authRouter);
+
+    // Admin routes (protegidas, requieren token válido)
+    application.use('/api/v1/admin', adminRouter);
+
     // Health check endpoint
     application.get('/health', (req, res) => {
         res.status(200).json({ 
@@ -46,10 +57,6 @@ export const Main = async () => {
             environment: process.env.NODE_ENV || 'development',
             database: 'connected' // TODO: add actual db health check
         });
-    });
-    
-    application.get('/main/healthcheck', (req, res, next) => {
-        return res.status(200).json({ status: 'ok' });
     });
 
     logging.info('---------------------------------');
