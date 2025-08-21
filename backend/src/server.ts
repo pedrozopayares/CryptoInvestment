@@ -1,3 +1,4 @@
+import { startCoinMarketCapCron } from './services/coinmarketcapService';
 import dotenv from 'dotenv';
 
 // Load environment variables FIRST
@@ -26,6 +27,9 @@ export const Main = async () => {
     
     // Database connection
     await connectDatabase();
+
+    // Iniciar cron de CoinMarketCap
+    startCoinMarketCapCron();
     
     // Express middleware
     application.use(express.json());

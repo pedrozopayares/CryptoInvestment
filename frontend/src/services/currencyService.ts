@@ -1,19 +1,18 @@
-import { User } from "@/types/Users";
 import { instanciaAxios } from "./axios";
 import { AxiosError } from "axios";
 
-export const authService = {
-    register: async (user: User) => {
+export const currencyService = {
+    getCurrencies: async () => {
         let response = null;
 
         try {
-            response = await instanciaAxios.post('/auth/register', user);
+            response = await instanciaAxios.get('/admin/cryptocurrencies');
 
             return {
                 error: false,
                 title: 'Exito',
-                message: `Usuario registrado correctamente`,
-                data: response
+                message: `Monedas obtenidas correctamente`,
+                data: response.data
             }
 
         } catch (error) {
@@ -30,23 +29,22 @@ export const authService = {
             return {
                 error: true,
                 title: 'Error',
-                message: `No se pudo registrar el usuario`,
+                message: `No se pudo obtener las monedas`,
                 data: response
             }
-
         }
     },
 
-    signin: async (user: User) => {
+    getPrices: async (cryptocurrencyId: number) => {
         let response = null;
 
         try {
-            response = await instanciaAxios.post('/auth/signin', user);
+            response = await instanciaAxios.get(`/admin/cryptocurrencies/${cryptocurrencyId}/history`);
 
             return {
                 error: false,
                 title: 'Exito',
-                message: `Usuario autenticado correctamente`,
+                message: `Historial de precios obtenido correctamente`,
                 data: response.data
             }
 
@@ -56,15 +54,15 @@ export const authService = {
                 return {
                     error: true,
                     title: 'Error',
-                    message: error.response.data.error || error.message || `No se pudo iniciar sesión`,
+                    message: error.response.data.error || error.message || `No se pudo obtener el historial de precios`,
                     data: response
                 }
             }
-
+            
             return {
                 error: true,
                 title: 'Error',
-                message: `No se pudo iniciar sesión`,
+                message: `No se pudo obtener el historial de precios`,
                 data: response
             }
 

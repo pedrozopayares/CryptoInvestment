@@ -14,10 +14,7 @@ const PanelLayout: React.FC<PanelLayoutProps> = () =>  {
       <Notify/>
       <Header/>
       <div className="flex h-screen">
-        <div className="w-1/5">
-          <Sidebar/>
-        </div>
-        <div className="w-4/5 p-5">
+        <div className="w-full p-5">
           <Outlet/>
         </div>
       </div>

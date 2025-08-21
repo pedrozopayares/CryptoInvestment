@@ -12,15 +12,15 @@ const tokenBlacklist = new Set<string>();
 export const authService = {
   async signin(email: string, password: string) {
     const user = await db.select().from(users).where(eq(users.email, email)).limit(1).then(rows => rows[0]);
-    if (!user) return { error: 'Invalid credentials.' };
+    if (!user) return { error: 'Credenciales inválidas.' };
     const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) return { error: 'Invalid credentials.' };
+    if (!valid) return { error: 'Credenciales inválidas.' };
     const token = jwt.sign({ id: user.id, email: user.email, username: user.username }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
     return { token };
   },
   signout(token: string) {
     tokenBlacklist.add(token);
-    return { message: 'Signed out.' };
+    return { message: 'Sesión finalizada.' };
   },
   isTokenBlacklisted(token: string) {
     return tokenBlacklist.has(token);

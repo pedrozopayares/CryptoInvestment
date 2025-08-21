@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import Notify from '../components/notify/Notify';
 
 interface AuthLayoutProps {
   children: ReactNode; // ReactNode permite cualquier contenido React válido
@@ -7,6 +8,7 @@ interface AuthLayoutProps {
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) =>  {                              
   return (
     <>
+      <Notify />
       <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
         <div className="relative z-10 bg-[url('/images/intro-0.jpg')] bg-no-repeat bg-cover bg-center before:content-['']
             before:absolute

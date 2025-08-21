@@ -1,4 +1,5 @@
 import { mysqlTable, varchar, int, decimal, bigint, timestamp, index, foreignKey } from 'drizzle-orm/mysql-core';
+import { json } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 
 // Tabla de criptomonedas
@@ -8,6 +9,18 @@ export const cryptocurrencies = mysqlTable('cryptocurrencies', {
   symbol: varchar('symbol', { length: 20 }).notNull(),
   slug: varchar('slug', { length: 100 }).notNull(),
   cmcRank: int('cmc_rank'),
+  numMarketPairs: int('num_market_pairs'),
+  circulatingSupply: decimal('circulating_supply', { precision: 38, scale: 10 }),
+  totalSupply: decimal('total_supply', { precision: 38, scale: 10 }),
+  maxSupply: decimal('max_supply', { precision: 38, scale: 10 }),
+  infiniteSupply: int('infinite_supply'), // 0 o 1
+  lastUpdated: timestamp('last_updated'),
+  dateAdded: timestamp('date_added'),
+  tags: varchar('tags', { length: 10000 }), // CSV de tags
+  platform: varchar('platform', { length: 100 }), // nombre plataforma o null
+  selfReportedCirculatingSupply: decimal('self_reported_circulating_supply', { precision: 38, scale: 10 }),
+  selfReportedMarketCap: decimal('self_reported_market_cap', { precision: 38, scale: 10 }),
+  infoJson: json('info_json'), // JSON con info extendida de la API
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 }, (table) => ({
@@ -19,12 +32,15 @@ export const cryptocurrencies = mysqlTable('cryptocurrencies', {
 export const prices = mysqlTable('prices', {
   id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
   cryptocurrencyId: int('cryptocurrency_id').notNull(),
-  price: decimal('price', { precision: 20, scale: 8 }).notNull(),
-  marketCap: bigint('market_cap', { mode: 'number' }),
-  volume24h: bigint('volume_24h', { mode: 'number' }),
-  percentChange1h: decimal('percent_change_1h', { precision: 10, scale: 4 }),
-  percentChange24h: decimal('percent_change_24h', { precision: 10, scale: 4 }),
-  percentChange7d: decimal('percent_change_7d', { precision: 10, scale: 4 }),
+  price: decimal('price', { precision: 50, scale: 10 }).notNull(),
+  marketCap: decimal('market_cap', { precision: 50, scale: 10 }),
+  volume24h: decimal('volume_24h', { precision: 50, scale: 10 }),
+  percentChange1h: decimal('percent_change_1h', { precision: 20, scale: 8 }),
+  percentChange24h: decimal('percent_change_24h', { precision: 20, scale: 8 }),
+  percentChange7d: decimal('percent_change_7d', { precision: 20, scale: 8 }),
+  marketCapDominance: decimal('market_cap_dominance', { precision: 20, scale: 8 }),
+  fullyDilutedMarketCap: decimal('fully_diluted_market_cap', { precision: 50, scale: 10 }),
+  volumeChange24h: decimal('volume_change_24h', { precision: 50, scale: 10 }),
   lastUpdated: timestamp('last_updated').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 }, (table) => ({
@@ -57,11 +73,11 @@ export const userFavorites = mysqlTable('user_favorites', {
   cryptocurrencyId: int('cryptocurrency_id').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 }, (table) => ({
-  userFk: foreignKey({
-    columns: [table.userId],
-    foreignColumns: [users.id],
-    name: 'fk_favorites_user'
-  }),
+  // userFk: foreignKey({
+  //   columns: [table.userId],
+  //   foreignColumns: [users.id],
+  //   name: 'fk_favorites_user'
+  // }),
   cryptocurrencyFk: foreignKey({
     columns: [table.cryptocurrencyId],
     foreignColumns: [cryptocurrencies.id],
