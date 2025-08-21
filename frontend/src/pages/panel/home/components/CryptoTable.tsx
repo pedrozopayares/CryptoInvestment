@@ -51,8 +51,8 @@ const CryptoTable: React.FC = () => {
                                 >
                                     <td className="px-2 py-2 font-semibold">{coin.favorite?.cmcRank}</td>
                                     <td className="px-2 py-2 text-xl">
-                                        { coin.favorite.infoJson?.logo ? (
-                                                <img src={coin.favorite.infoJson?.logo} alt={coin.favorite.name} className="w-6 h-6 inline-block mr-2" /> 
+                                        { coin.favorite?.infoJson?.logo ? (
+                                                <img src={coin.favorite?.infoJson?.logo} alt={coin.favorite.name} className="w-6 h-6 inline-block mr-2" /> 
                                             ) : (
                                                 <span className="inline-block w-6 h-6 bg-gray-200 rounded-full mr-2"></span>
                                             )
