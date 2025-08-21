@@ -9,8 +9,8 @@ dotenv.config();
 
 const API_KEY = process.env.COINMARKETCAP_API_KEY;
 const BASE_URL = process.env.COINMARKETCAP_BASE_URL || 'https://pro-api.coinmarketcap.com';
-const UPDATE_INTERVAL = parseInt(process.env.COINMARKETCAP_UPDATE_INTERVAL || '190000');
-const INFO_UPDATE_INTERVAL = parseInt(process.env.COINMARKETCAP_INFO_UPDATE_INTERVAL || '3600000'); // default: 1h
+const UPDATE_INTERVAL = parseInt(process.env.COINMARKETCAP_UPDATE_INTERVAL || '30000');  // 30 seconds
+const INFO_UPDATE_INTERVAL = parseInt(process.env.COINMARKETCAP_INFO_UPDATE_INTERVAL || '900000'); // 15 minutes
 // Actualiza infoJson para todos los ids de cryptocurrencies
 async function updateAllCoinInfoJson() {
   try {
@@ -44,6 +44,44 @@ async function updateAllCoinInfoJson() {
     console.log(`[CoinMarketCap] infoJson actualizado para ${updatedCount} monedas favoritas`);
   } catch (error) {
     console.error('[CoinMarketCap] Error actualizando infoJson:', error);
+  }
+}
+
+// Actualiza infoJson para todos los ids de cryptocurrencies
+async function updateAllCoinInfoJsonFirstRun() {
+  try {
+    // Obtener solo los ids de todas las monedas en la tabla cryptocurrencies
+    const idsResult = await db.execute(`SELECT id FROM cryptocurrencies`);
+    const ids = (Array.isArray(idsResult[0]) ? idsResult[0] : []) as { id: number }[];
+    if (!ids.length) return;
+    // Lotes de 500 ids para evitar error 414
+    const chunkSize = 500;
+    let updatedCount = 0;
+
+    //Consultar con retardo entre llamadas de 30 segundos para evitar rate limit
+    for (let i = 0; i < ids.length; i += chunkSize) {
+      const chunkIds = ids.slice(i, i + chunkSize);
+      const chunk = chunkIds.map(obj => obj.id).join(',');
+      const response = await axiosInstance.get('/v2/cryptocurrency/info', {
+        params: { id: chunk },
+      });
+      const data = response.data.data;
+      for (const id of Object.keys(data)) {
+        const info = data[id];
+        await db.update(cryptocurrencies)
+          .set({ infoJson: info, updatedAt: new Date() })
+          .where(eq(cryptocurrencies.id, Number(id)));
+        updatedCount++;
+      }
+      // Espera 30 segundos entre cada chunk para evitar rate limit
+      if (i + chunkSize < ids.length) {
+        console.log(`[CoinMarketCap] Esperando 30 segundos antes de procesar el siguiente chunk...`);
+        await new Promise(res => setTimeout(res, 30 * 1000));
+      }
+    }
+    console.log(`[CoinMarketCap] infoJson actualizado para ${updatedCount} monedas (primer run)`);
+  } catch (error) {
+    console.error('[CoinMarketCap] Error actualizando infoJson (primer run):', error);
   }
 }
 
@@ -145,17 +183,17 @@ export async function fetchAndStoreCoinInfo(coinId: number) {
 }
 
 // Cron job setup usando node-cron
-export function startCoinMarketCapCron() {
+export async function startCoinMarketCapCron() {
   // Cron para precios y datos básicos
-  // fetchAndStoreLatestListings(); // Run immediately on start
+  await fetchAndStoreLatestListings(); // Run immediately on start
   const cronExpr = msToCron(UPDATE_INTERVAL);
   cron.schedule(cronExpr, fetchAndStoreLatestListings, { timezone: 'UTC' });
   console.log(`[CoinMarketCap] Cron started. Expression: ${cronExpr} (interval: ${UPDATE_INTERVAL}ms)`);
 
   // Cron para info extendida (infoJson)
-  updateAllCoinInfoJson(); // Run immediately on start
+  updateAllCoinInfoJsonFirstRun(); // Run immediately on start
   console.info(`[CoinMarketCap] InfoJson cron started. Running immediately on start.`, INFO_UPDATE_INTERVAL);
-  const infoCronExpr = msToCron(INFO_UPDATE_INTERVAL || 3600000); // default: 1h
+  const infoCronExpr = msToCron(INFO_UPDATE_INTERVAL || 900000); // default: 1h
   cron.schedule(infoCronExpr, updateAllCoinInfoJson, { timezone: 'UTC' });
   console.log(`[CoinMarketCap] InfoJson cron started. Expression: ${infoCronExpr} (interval: ${INFO_UPDATE_INTERVAL}ms)`);
 }
