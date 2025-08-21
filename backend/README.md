@@ -17,18 +17,23 @@ Este backend provee una API REST y WebSocket para la gestión y consulta de crip
 
 ## 📦 Instalación y configuración
 
-1. Instala dependencias:
-	```bash
-	npm install
-	```
-2. Copia y edita el archivo de entorno:
+1. Clona el repositorio.
+2. Cambia el nombre del archivo de entorno y configúralo:
 	```bash
 	cp .env.example .env
-	# Edita las variables de conexión a MySQL y JWT_SECRET
+	# Edita las variables de conexión a MySQL, JWT_SECRET y API Key de CoinMarketCap
 	```
-3. Compila y ejecuta:
+3. Entra a la carpeta backend:
 	```bash
-	npm run build && npm start
+	cd backend
+	```
+4. Levanta los servicios con Docker:
+	```bash
+	docker-compose up --build
+	```
+5. Espera a que la base de datos esté lista y luego ejecuta las migraciones de Drizzle:
+	```bash
+	npm run db:push
 	```
 
 ---
