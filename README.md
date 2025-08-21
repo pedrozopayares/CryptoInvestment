@@ -5,33 +5,6 @@ CryptoInvestment es una aplicación web **fullstack** que permite a un grupo de 
 
 ---
 
-## 🔌 WebSocket API (Tiempo real y autenticación JWT)
-
-El backend expone un WebSocket en el **mismo puerto** que la API HTTP, permitiendo comunicación bidireccional en tiempo real (por ejemplo, para actualizaciones de precios, notificaciones, etc.).
-
-- **URL de conexión:**
-  - `ws://localhost:3001/?token=TU_JWT_AQUI`
-  - El token JWT debe ser válido y se envía como query param `token`.
-
-- **Autenticación:**
-  - El servidor valida el JWT al conectar. Si es inválido, la conexión se cierra inmediatamente.
-  - Solo usuarios autenticados pueden mantener la conexión.
-
-- **Ejemplo de conexión desde el frontend:**
-  ```js
-  const ws = new WebSocket('ws://localhost:3001/?token=TU_JWT_AQUI');
-  ws.onopen = () => ws.send('Hola WebSocket');
-  ws.onmessage = (event) => console.log('Mensaje:', event.data);
-  ws.onclose = (event) => console.log('Cerrado:', event.code, event.reason);
-  ```
-
-- **Notas:**
-  - El WebSocket comparte el puerto con la API REST.
-  - Puedes enviar y recibir mensajes en tiempo real.
-  - El backend puede emitir eventos a todos los clientes autenticados.
-
----
-
 ## 🚀 Tecnologías
 
 - **Frontend:** React.js + Vite (SPA, Single Page Application)
@@ -72,22 +45,32 @@ El backend expone un WebSocket en el **mismo puerto** que la API HTTP, permitien
 git clone https://github.com/pedrozopayares/cryptoinvestment.git
 ````
 
+
+
 ### 2. Configurar el backend
 
 ```bash
-cd cryptoinvestment-backend
-yarn install
+# 1. Cambia el nombre del archivo de entorno y configúralo
 cp .env.example .env
-# Editar el archivo .env con las credenciales de MySQL y API Key de CoinMarketCap
-yarn start
+# 2. Entra a la carpeta backend
+cd backend
+# 3. Levanta los servicios con Docker
+docker-compose up --build
+# 4. Espera a que la base de datos esté lista y luego ejecuta las migraciones de Drizzle
+npm run db:push
 ```
+
+
 
 ### 3. Configurar el frontend
 
 ```bash
-cd cryptoinvestment
-yarn install
-yarn start
+# 1. Entra a la carpeta frontend
+cd frontend
+# 2. Instala dependencias
+npm install
+# 3. Ejecuta la aplicación en modo desarrollo
+npm run dev
 ```
 
 ---

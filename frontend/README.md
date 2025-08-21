@@ -27,19 +27,19 @@ Esta es la aplicación web (SPA) que sirve como panel para que los usuarios cons
 
 ## ⚙️ Instalación y configuración
 
-1. Instala dependencias:
-   ```bash
-   npm install
-   # o
-   yarn install
-   ```
-2. Configura el archivo `.env` si es necesario (por ejemplo, para la URL del backend).
-3. Ejecuta la SPA en modo desarrollo:
-   ```bash
-   npm run dev
-   # o
-   yarn dev
-   ```
+1. Entra a la carpeta `frontend`:
+  ```bash
+  cd frontend
+  ```
+2. Instala dependencias:
+  ```bash
+  npm install
+  ```
+3. Ejecuta la aplicación en modo desarrollo:
+  ```bash
+  npm run dev
+  ```
+4. (Opcional) Configura el archivo `.env` si necesitas personalizar la URL del backend u otras variables.
 
 ---
 
